@@ -59,12 +59,12 @@ public class Board {
         board[getFoodX()][getFoodY()] = "*";
     }
 
-    public void addPart(Snake part) {
-        int x = part.getX();
-        int y = part.getY();
+    public void addPart() {
+        int x = parts.get(parts.size()).getX();
+        int y = parts.get(parts.size()).getY();
+        parts.add(new Snake(x, y));
         board[x][y] = "x";
 
-        parts.add(new Snake(x, y - 1));
     }
 
 
@@ -94,42 +94,13 @@ public class Board {
             score++;
             setFoodX(r.nextInt(1, 8));
             setFoodY(r.nextInt(2, 38));
-
             spawnFood();
         }
     }
 
-    public void creatingNewPart(boolean isEaten) {
-        if (true)
-            addPart(parts.get(parts.size() - 1));
-    }
-
-    public void movement(int head) {
-        if (parts.get(0).getX() == 1) {
-            parts.get(0).setX(9);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[parts.get(0).getX()][parts.get(0).getY()] = "-";
-        }
-        int tempX = parts.get(parts.size() - 1).getX();
-        int tempY = parts.get(parts.size() - 1).getY();
-
-        for (int i = parts.size() - 1; i > 0; i--) {
-            parts.get(i).setX(parts.get(i-1).getX());
-            parts.get(i).setY(parts.get(i-1).getY());
-            board[parts.get(i).getX()][parts.get(i).getY()] = "x";
-        }
-        parts.get(0).setX(head);
-        board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-        board[tempX][tempY] = "-";
-
-        printBoard();
-    }
-
-
     public void Up() {
 
         int headX = parts.get(0).getX() - 1;
-        ifEaten();
 
         if (parts.get(0).getX() == 1) {
             parts.get(0).setX(9);

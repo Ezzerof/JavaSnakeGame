@@ -19,16 +19,19 @@ public class Game extends Board {
             switch (direction) {
                 case "w" :
                     Up();
-//                    creatingNewPart(ifEaten());
+                    ifEaten();
                     break;
                 case "s":
                     Down();
+                    ifEaten();
                     break;
                 case "d":
                     Rigth();
+                    ifEaten();
                     break;
                 case "a":
                     Left();
+                    ifEaten();
                     break;
                 default:
                     isOn = false;
