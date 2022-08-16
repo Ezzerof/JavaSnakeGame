@@ -13,13 +13,15 @@ public class Game extends Board {
         initSnake();
 
         while (isOn) {
-            Character [] accChar = new Character[]{'a', 'd', 'w', 's'};
+            Character [] accChar = new Character[]{'a', 'd', 'w', 's', 'x'};
             String direction = getUserInput(scanner);
 
 
             if (direction.equals("w") || direction.equals("s") || direction.equals("a") || direction.equals("d")) {
                 sneakMovement(direction);
-            } else {
+            } else if (direction.equals("x")) {
+                isOn = false;
+            }else {
                 printBoard();
                 System.out.println("Wrong letter, please use any of direction letters");
             }
