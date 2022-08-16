@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class Board {
@@ -6,21 +6,23 @@ public class Board {
     Random r = new Random();
     private int xCor = r.nextInt(1,8);
     private int yCor = r.nextInt(4, 36);
-    private int xF = r.nextInt(1, 8); //Food X
-    private int yF = r.nextInt(2, 38); // Food Y
+    private int xFood;
+    private int yFood;
     private static int score = 0;
+    private LinkedList<Snake> allSnakeParts = new LinkedList<>();
 
-    public static ArrayList<Snake> parts = new ArrayList<>();
-
+    public int getSnakeLen() { return allSnakeParts.size(); }
 
 
     public int getxCor() { return xCor; }
+
     public int getyCor() { return yCor; }
-    public int getFoodX() { return xF; }
-    public int getFoodY() { return yF; }
-    public void setFoodX(int x) { this.xF = x; }
-    public void setFoodY(int y) { this.yF = y; }
+
     public int getScore() { return score; }
+
+    Snake head = new Snake(getxCor(), getyCor());
+    Snake body1 = new Snake(getxCor(), getyCor() - 1);
+    Snake body2 = new Snake(getxCor(), getyCor() - 2);
 
     public String[][] board = {
             {"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"}, //40
@@ -51,150 +53,106 @@ public class Board {
 
     }
 
-    Snake head = new Snake(getxCor(), getyCor());
-    Snake body1 = new Snake(getxCor(), getyCor() + 1);  //Creating 3 parts of the snake
-    Snake body2 = new Snake(getxCor(), getyCor() + 2);
+    public int getFoodX() { return xFood; }
+
+    public int getFoodY() { return yFood; }
 
     public void spawnFood() {
-        board[getFoodX()][getFoodY()] = "*";
-    }
 
-    public void addPart() {
-        int x = parts.get(parts.size()).getX();
-        int y = parts.get(parts.size()).getY();
-        parts.add(new Snake(x, y));
-        board[x][y] = "x";
+        xFood = r.nextInt(1,8);
+        yFood = r.nextInt(2, 38);
 
-    }
-
-
-    public void init() {
-        parts.add(head);
-        parts.add(body1); // Adding parts to the Snake Array
-        parts.add(body2);
-    }
-
-    public void setSnake() {
-        if (head.getY() != getFoodY()) {
-
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-
-            for (int i = 1; i < parts.size(); i++) {
-                int x = parts.get(i).getX();
-                int y = parts.get(i).getY();
-                board[x][y] = "x";
-            }
-
-            printBoard();
-        }
-    }
-
-    public void ifEaten() {
-        if (parts.get(0).getX() == getFoodX() && parts.get(0).getY() == getFoodY()) {
-            score++;
-            setFoodX(r.nextInt(1, 8));
-            setFoodY(r.nextInt(2, 38));
+        if (allSnakeParts.getFirst().getX() != xFood && allSnakeParts.getFirst().getY() != yFood) {
+            board[getFoodX()][getFoodY()] = "*";
+        } else {
             spawnFood();
         }
     }
 
-    public void Up() {
-
-        int headX = parts.get(0).getX() - 1;
-
-        if (parts.get(0).getX() == 1) {
-            parts.get(0).setX(9);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[parts.get(0).getX()][parts.get(0).getY()] = "-";
+    public void foodEaten() {
+        if (allSnakeParts.getFirst().getX() == xFood && allSnakeParts.getFirst().getY() == yFood) {
+            ++score;
+            spawnFood();
+            createNewSnakePart();
         }
-        int tempX = parts.get(parts.size() - 1).getX();
-        int tempY = parts.get(parts.size() - 1).getY();
+    }
 
-        for (int i = parts.size() - 1; i > 0; i--) {
-            parts.get(i).setX(parts.get(i-1).getX());
-            parts.get(i).setY(parts.get(i-1).getY());
-            board[parts.get(i).getX()][parts.get(i).getY()] = "x";
-        }
-            parts.get(0).setX(headX);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[tempX][tempY] = "-";
+    public void initSnake() {
+        allSnakeParts.add(head);
+        allSnakeParts.add(body1);
+        allSnakeParts.add(body2);
 
+        board[head.getX()][head.getY()] = "X";
+        board[body1.getX()][body1.getY()] = "x";
+        board[body2.getX()][body2.getY()] = "x";
+        spawnFood();
         printBoard();
     }
 
-    public void Down() {
-        int headX = parts.get(0).getX() + 1;
-        ifEaten();
+    public void createNewSnakePart() {
+        int index = allSnakeParts.size() - 2;
+        Snake tempSnake = allSnakeParts.getLast();
+        Snake tempSnake2 = allSnakeParts.get(index);
 
-        if (parts.get(0).getX() == 9) {
-            parts.get(0).setX(0);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[parts.get(0).getX()][parts.get(0).getY()] = "-";
+        int sumX = tempSnake.getX() -  tempSnake2.getX();
+        int sumY = tempSnake.getY() - tempSnake2.getY();
+
+        if ( sumX == 0) {
+            allSnakeParts.add(new Snake(tempSnake.getX(), tempSnake.getY() + 1));
+        } else if (sumY == 0) {
+            allSnakeParts.add(new Snake(tempSnake.getX() + 1, tempSnake.getY()));
         }
-        int tempX = parts.get(parts.size() - 1).getX();
-        int tempY = parts.get(parts.size() - 1).getY();
+    }
 
-        for (int i = parts.size() - 1; i > 0; i--) {
-            parts.get(i).setX(parts.get(i-1).getX());
-            parts.get(i).setY(parts.get(i-1).getY());
-            board[parts.get(i).getX()][parts.get(i).getY()] = "x";
+    public void movingBody() {
+        board[allSnakeParts.get(allSnakeParts.size() - 1).getX()][allSnakeParts.get(allSnakeParts.size() - 1).getY()] = "-";
+        for (int i = allSnakeParts.size(); i > 1; i-- ) {
+            allSnakeParts.get(i - 1).setX(allSnakeParts.get(i - 2).getX());
+            allSnakeParts.get(i - 1).setY(allSnakeParts.get(i - 2).getY());
+            board[allSnakeParts.get(i - 1).getX()][allSnakeParts.get(i - 1).getY()] = "x";
         }
-        parts.get(0).setX(headX);
-        board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-        board[tempX][tempY] = "-";
+    }
 
-        printBoard();
+    public void sneakMovement(String direction) {
+
+        int tempX = allSnakeParts.getFirst().getX();
+        int tempY = allSnakeParts.getFirst().getY();
+
+        switch (direction) {
+
+            case "w":
+                movingBody();
+                allSnakeParts.getFirst().setX(tempX - 1);
+                foodEaten();
+                board[allSnakeParts.getFirst().getX()][allSnakeParts.getFirst().getY()] = "X";
+                printBoard();
+                break;
+            case "s":
+                movingBody();
+                allSnakeParts.getFirst().setX(tempX + 1);
+                foodEaten();
+                board[allSnakeParts.getFirst().getX()][allSnakeParts.getFirst().getY()] = "X";
+                printBoard();
+                break;
+            case "a":
+                movingBody();
+                allSnakeParts.getFirst().setY(tempY - 1);
+                foodEaten();
+                board[allSnakeParts.getFirst().getX()][allSnakeParts.getFirst().getY()] = "X";
+                printBoard();
+                break;
+            case "d":
+                movingBody();
+                allSnakeParts.getFirst().setY(tempY + 1);
+                foodEaten();
+                board[allSnakeParts.getFirst().getX()][allSnakeParts.getFirst().getY()] = "X";
+                printBoard();
+                break;
+
+        }
 
     }
 
-    public void Left() {
-
-        int headX = parts.get(0).getY() - 1;
-
-        if (parts.get(0).getX() == 1) {
-            parts.get(0).setX(9);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[parts.get(0).getX()][parts.get(0).getY()] = "-";
-        }
-
-        int tempX = parts.get(parts.size() - 1).getX();
-        int tempY = parts.get(parts.size() - 1).getY();
-
-        for (int i = parts.size() - 1; i > 0; i--) {
-            parts.get(i).setX(parts.get(i-1).getX());
-            parts.get(i).setY(parts.get(i-1).getY());
-            board[parts.get(i).getX()][parts.get(i).getY()] = "x";
-        }
-        parts.get(0).setY(headX);
-        board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-        board[tempX][tempY] = "-";
-
-        printBoard();
-
-    }
-
-    public void Rigth() {
-
-        int headX = parts.get(0).getY() + 1;
-
-        if (parts.get(0).getX() == 1) {
-            parts.get(0).setX(9);
-            board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-            board[parts.get(0).getX()][parts.get(0).getY()] = "-";
-        }
-        int tempX = parts.get(parts.size() - 1).getX();
-        int tempY = parts.get(parts.size() - 1).getY();
-
-        for (int i = parts.size() - 1; i > 0; i--) {
-            parts.get(i).setX(parts.get(i-1).getX());
-            parts.get(i).setY(parts.get(i-1).getY());
-            board[parts.get(i).getX()][parts.get(i).getY()] = "x";
-        }
-        parts.get(0).setY(headX);
-        board[parts.get(0).getX()][parts.get(0).getY()] = "X";
-        board[tempX][tempY] = "-";
-
-        printBoard();
-
-    }
+    //TO DO
+    //If snake reached tail = game over
 }
