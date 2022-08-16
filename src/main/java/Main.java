@@ -7,11 +7,6 @@ public class Main {
 
         g.startGame();
 
-
-
-
-
-
     }
 
 }
