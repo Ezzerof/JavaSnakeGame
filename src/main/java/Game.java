@@ -1,14 +1,10 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class Game extends Board {
-
+    public boolean isOn = true;
+    private String[] tempDirections = new String[2];
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
-
-        boolean isOn = true;
 
         initSnake();
 
@@ -19,6 +15,7 @@ public class Game extends Board {
 
             if (direction.equals("w") || direction.equals("s") || direction.equals("a") || direction.equals("d")) {
                 sneakMovement(direction);
+                isOn = wrongMovement();
             } else if (direction.equals("x")) {
                 isOn = false;
             }else {

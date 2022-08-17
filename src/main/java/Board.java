@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Random;
 
 public class Board {
@@ -99,6 +100,7 @@ public String[][] board;
         }
     }
 
+            //Moving every part of body after head
     public void movingBody() {
         board[allSnakeParts.get(allSnakeParts.size() - 1).getX()][allSnakeParts.get(allSnakeParts.size() - 1).getY()] = "-";
         for (int i = allSnakeParts.size(); i > 1; i-- ) {
@@ -106,6 +108,29 @@ public String[][] board;
             allSnakeParts.get(i - 1).setY(allSnakeParts.get(i - 2).getY());
             board[allSnakeParts.get(i - 1).getX()][allSnakeParts.get(i - 1).getY()] = "x";
         }
+    }
+            // if head hits any part of body or borders = Game Over
+    public boolean wrongMovement() {
+        for (int i = 1; i < allSnakeParts.size(); i++) {
+            if (allSnakeParts.getFirst().getX() == allSnakeParts.get(i).getX() && allSnakeParts.getFirst().getY() == allSnakeParts.get(i).getY()) {
+                System.out.println("Game Over.");
+                return false;
+            }
+        }
+
+        try {
+            int x = allSnakeParts.getFirst().getX();
+            int y = allSnakeParts.getFirst().getY();
+
+            if (x == 0 || y == 0 || x == 9 || y == 39) {
+                System.out.println("Game Over, you hit the wall");
+                return false;
+            }
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+        }
+
+        return true;
     }
 
     public void sneakMovement(String direction) {
